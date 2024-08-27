@@ -4,10 +4,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedElement = document.getElementById('selected');
     const buttons = document.getElementById('buttons');
     const historyList = document.getElementById('history-list');
+    const historyContainer = document.getElementById('history-container');
     const startGameButton = document.createElement('button');
     startGameButton.textContent = 'Start Game';
     startGameButton.style.display = 'none';
     startGameButton.style.marginTop = '10px';
+
+    // Create winner announcement element
+    const winnerAnnouncement = document.createElement('button');
+    winnerAnnouncement.style.display = 'none';
+    winnerAnnouncement.style.fontSize = '16px';
+    winnerAnnouncement.style.padding = '10px 20px';
+    winnerAnnouncement.style.backgroundColor = '#4CAF50';
+    winnerAnnouncement.style.color = 'white';
+    winnerAnnouncement.style.border = 'none';
+    winnerAnnouncement.style.borderRadius = '5px';
+    winnerAnnouncement.style.margin = '10px 0';
+    board.before(winnerAnnouncement);
 
     const gridSize = 5;
     let currentPlayer = 'A';
@@ -39,10 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         board.after(startGameButton);
 
-        // Hide selected element, history list, and buttons initially
         selectedElement.style.display = 'none';
-        historyList.style.display = 'none';
+        historyContainer.style.display = 'none';
         buttons.style.display = 'none';
+
+        currentPlayerElement.textContent = `Player A, place your P1`;
 
         updateBoard();
     };
@@ -77,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (placedCharacters[currentPlayer] === 5) {
             if (currentPlayer === 'A') {
                 currentPlayer = 'B';
-                currentPlayerElement.textContent = 'Player B, place your characters. Start with P1';
+                currentPlayerElement.textContent = 'Player B, place your P1';
             } else {
                 currentPlayerElement.textContent = 'All characters placed. Click Start Game to begin.';
                 startGameButton.style.display = 'block';
@@ -221,12 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
         newCol += deltaCol;
     
         if (isValidMove(newRow, newCol, player)) {
-            handleCombat(character, row, col, deltaRow, deltaCol);
+            const capturedCharacters = handleCombat(character, row, col, deltaRow, deltaCol);
             characters[character].row = newRow;
             characters[character].col = newCol;
-            addMoveToHistory(character, move);
+            addMoveToHistory(character, move, capturedCharacters.join(', '));
             switchPlayer();
             updateBoard();
+            checkWinner();
         } else {
             alert('Invalid move!');
         }
@@ -237,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleCombat = (character, startRow, startCol, deltaRow, deltaCol) => {
+        let capturedCharacters = [];
         let row = startRow + Math.sign(deltaRow);
         let col = startCol + Math.sign(deltaCol);
 
@@ -246,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             if (opponent) {
+                capturedCharacters.push(opponent);
                 delete characters[opponent];
             }
 
@@ -261,8 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (finalOpponent) {
+            capturedCharacters.push(finalOpponent);
             delete characters[finalOpponent];
         }
+
+        return capturedCharacters;
     };
 
     const switchPlayer = () => {
@@ -271,11 +291,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('highlight', 'highlight-enemy'));
     };
 
-    const addMoveToHistory = (character, move) => {
+    const addMoveToHistory = (character, move, capturedCharacters = null) => {
         const listItem = document.createElement('li');
-        listItem.textContent = `${character} moved ${move}`;
-        moveHistory.push(listItem.textContent);
+        let moveText = `${character} moved ${move}`;
+        if (capturedCharacters) {
+            moveText += ` <span style="color: red;">(Captured ${capturedCharacters})</span>`;
+        }
+        listItem.innerHTML = moveText;
+        moveHistory.push(listItem.innerHTML);
         historyList.appendChild(listItem);
+    };
+
+    const checkWinner = () => {
+        const playerACharacters = Object.values(characters).filter(char => char.player === 'A');
+        const playerBCharacters = Object.values(characters).filter(char => char.player === 'B');
+        
+        if (playerBCharacters.length === 0) {
+            announceWinner('Player A');
+        } else if (playerACharacters.length === 0) {
+            announceWinner('Player B');
+        }
+    };
+
+    const announceWinner = (winner) => {
+        gameStarted = false;
+        winnerAnnouncement.textContent = `${winner} wins!`;
+        winnerAnnouncement.style.display = 'inline-block';
+        currentPlayerElement.style.display = 'none';
+        winnerAnnouncement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     startGameButton.addEventListener('click', () => {
@@ -283,10 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
         startGameButton.style.display = 'none';
         currentPlayer = 'A';
         currentPlayerElement.textContent = 'Current Player: A';
+        currentPlayerElement.style.display = 'block';
         
-        // Show selected element, history list, and buttons when game starts
         selectedElement.style.display = 'block';
-        historyList.style.display = 'block';
+        historyContainer.style.display = 'block';
         buttons.style.display = 'block';
         
         updateBoard();
