@@ -42,11 +42,11 @@
 }
 
 .player-a {
-    background-color: lightblue;
+    background-color: rgba(173, 216, 230, 0.329);
 }
 
 .player-b {
-    background-color: rgb(238, 145, 22);
+    background-color: rgb(238, 145, 22, 0.329);
 }
 
 .highlight {
@@ -130,3 +130,6 @@ button:hover {
     text-align: center;
     margin-bottom: 10px;
 }
+
+
+

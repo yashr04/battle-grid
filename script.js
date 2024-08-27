@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
     winnerAnnouncement.style.margin = '10px 0';
     board.before(winnerAnnouncement);
 
+    // Create restart game button
+    const restartGameButton = document.createElement('button');
+    restartGameButton.textContent = 'Restart Game';
+    restartGameButton.style.display = 'none';
+    restartGameButton.style.marginTop = '10px';
+    restartGameButton.style.marginLeft = '10px';
+    winnerAnnouncement.after(restartGameButton);
+
     const gridSize = 5;
     let currentPlayer = 'A';
     let selectedCharacter = null;
@@ -128,6 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
             cell.textContent = key;
             cell.classList.add(`player-${player.toLowerCase()}`);
+            if (key === selectedCharacter) {
+                cell.classList.add('selected');
+            }
         });
 
         if (gameStarted) {
@@ -333,7 +344,45 @@ document.addEventListener('DOMContentLoaded', () => {
         winnerAnnouncement.textContent = `${winner} wins!`;
         winnerAnnouncement.style.display = 'inline-block';
         currentPlayerElement.style.display = 'none';
+        restartGameButton.style.display = 'inline-block';
         winnerAnnouncement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const restartGame = () => {
+        // Reset game state
+        currentPlayer = 'A';
+        selectedCharacter = null;
+        Object.keys(characters).forEach(key => delete characters[key]);
+        moveHistory.length = 0;
+        gameStarted = false;
+        placedCharacters = { A: 0, B: 0 };
+
+        // Clear the board
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('player-a', 'player-b', 'selected', 'highlight', 'highlight-enemy');
+        });
+
+        // Reset UI elements
+        currentPlayerElement.textContent = `Player A, place your A-P1`;
+        currentPlayerElement.style.display = 'block';
+        selectedElement.style.display = 'none';
+        historyContainer.style.display = 'none';
+        buttons.style.display = 'none';
+        winnerAnnouncement.style.display = 'none';
+        restartGameButton.style.display = 'none';
+        startGameButton.style.display = 'none';
+
+        // Clear history list
+        historyList.innerHTML = '';
+
+        // Show movement guide
+        const movementGuide = document.getElementById('movement-guide');
+        if (movementGuide) {
+            movementGuide.style.display = 'block';
+        }
+
+        updateBoard();
     };
 
     startGameButton.addEventListener('click', () => {
@@ -356,8 +405,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBoard();
     });
 
+    restartGameButton.addEventListener('click', restartGame);
+
     initializeGame();
 
     // Reposition the Selected element below the grid
     board.after(selectedElement);
+
+    // Add CSS for highlighting selected character
+    const style = document.createElement('style');
+    style.textContent = `
+        .cell.selected {
+    `;
+    document.head.appendChild(style);
 });
