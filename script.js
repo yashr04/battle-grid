@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const characters = {};
     const moveHistory = [];
     let gameStarted = false;
+    let gameEnded = false;
     let placedCharacters = { A: 0, B: 0 };
     const characterOrder = ['P1', 'P2', 'H1', 'H2', 'P3'];
 
@@ -49,8 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 board.appendChild(cell);
 
                 cell.addEventListener('click', () => {
-                    if (!gameStarted) {
-                        placeCharacter(cell);
+                    if (gameEnded) {
+                        alert('Game has ended. Restart Game to play again.');
+                    } else if (!gameStarted) {
+                        if (placedCharacters['A'] === 5 && placedCharacters['B'] === 5) {
+                            alert('Click Start Game button to play the game.');
+                        } else {
+                            placeCharacter(cell);
+                        }
                     } else {
                         selectCharacter(cell);
                     }
@@ -141,14 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (gameStarted) {
+        if (gameStarted && !gameEnded) {
             currentPlayerElement.textContent = `Current Player: ${currentPlayer}`;
             selectedElement.textContent = selectedCharacter ? `Selected: ${selectedCharacter}` : 'Selected: None';
         }
     };
 
     const selectCharacter = (cell) => {
-        if (!gameStarted) return;
+        if (!gameStarted || gameEnded) return;
 
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
@@ -171,6 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showMoveOptions = (character) => {
         buttons.innerHTML = '';
+
+        if (gameEnded) return;
 
         const { type } = characters[character];
 
@@ -231,6 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const makeMove = (character, move) => {
+        if (gameEnded) {
+            alert('Game has ended. Restart Game to play again.');
+            return;
+        }
+
         const { row, col, type, player } = characters[character];
         let newRow = row, newCol = col;
     
@@ -318,6 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const addMoveToHistory = (character, move, capturedCharacters) => {
+        if (gameEnded) return;
+
         const listItem = document.createElement('li');
         let moveText = `${character}: ${move}`;
         if (capturedCharacters.length > 0) {
@@ -341,10 +357,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const announceWinner = (winner) => {
         gameStarted = false;
+        gameEnded = true;
         winnerAnnouncement.textContent = `${winner} wins!`;
         winnerAnnouncement.style.display = 'inline-block';
         currentPlayerElement.style.display = 'none';
         restartGameButton.style.display = 'inline-block';
+        buttons.innerHTML = ''; // Clear move buttons
+        selectedElement.textContent = 'Selected: None'; // Reset selected character display
         winnerAnnouncement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
@@ -355,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(characters).forEach(key => delete characters[key]);
         moveHistory.length = 0;
         gameStarted = false;
+        gameEnded = false;
         placedCharacters = { A: 0, B: 0 };
 
         // Clear the board
@@ -416,6 +436,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const style = document.createElement('style');
     style.textContent = `
         .cell.selected {
+            border: 2px solid yellow;
+        }
+        .cell.highlight {
+            background-color: rgba(0, 255, 0, 0.3);
+        }
+        .cell.highlight-enemy {
+            background-color: rgba(255, 0, 0, 0.3);
+        }
     `;
     document.head.appendChild(style);
 });
