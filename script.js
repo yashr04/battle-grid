@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         historyContainer.style.display = 'none';
         buttons.style.display = 'none';
 
-        currentPlayerElement.textContent = `Player A, place your P1`;
+        currentPlayerElement.textContent = `Player A, place your A-P1`;
 
         // Add character movement guide
         const guideContainer = document.createElement('div');
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guideContainer.innerHTML = `
             <h3>Piece Movement Guide</h3>
             <ul>
-                <li>Pawn (P): Moves 1 step straight in any direction (⬅️ ➡️ ⬆️ ⬇️)</li>
+                <li>Pawn (P1,P2,P3): Moves 1 step straight in any direction (⬅️ ➡️ ⬆️ ⬇️)</li>
                 <li>Hero1 (H1): Moves 2 steps straight in any direction (⬅️ ➡️ ⬆️ ⬇️)</li>
                 <li>Hero2 (H2): Moves 2 steps diagonally in any direction (↖️ ↗️ ↙️ ↘️)</li>
             </ul>
@@ -106,14 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (placedCharacters[currentPlayer] === 5) {
             if (currentPlayer === 'A') {
                 currentPlayer = 'B';
-                currentPlayerElement.textContent = 'Player B, place your P1';
+                currentPlayerElement.textContent = 'Player B, place your B-P1';
             } else {
                 currentPlayerElement.textContent = 'All characters placed. Click Start Game to begin.';
                 startGameButton.style.display = 'block';
             }
         } else {
             const nextCharType = characterOrder[placedCharacters[currentPlayer]];
-            currentPlayerElement.textContent = `Player ${currentPlayer}, place your ${nextCharType}`;
+            currentPlayerElement.textContent = `Player ${currentPlayer}, place your ${currentPlayer}-${nextCharType}`;
         }
     };
 
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(characters).forEach(key => {
             const { row, col, player } = characters[key];
             const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-            cell.textContent = key.split('-')[1];
+            cell.textContent = key;
             cell.classList.add(`player-${player.toLowerCase()}`);
         });
 
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const capturedCharacters = handleCombat(character, row, col, deltaRow, deltaCol);
             characters[character].row = newRow;
             characters[character].col = newCol;
-            addMoveToHistory(character, move, capturedCharacters.join(', '));
+            addMoveToHistory(character, move, capturedCharacters);
             switchPlayer();
             updateBoard();
             checkWinner();
@@ -306,11 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('highlight', 'highlight-enemy'));
     };
 
-    const addMoveToHistory = (character, move, capturedCharacters = null) => {
+    const addMoveToHistory = (character, move, capturedCharacters) => {
         const listItem = document.createElement('li');
-        let moveText = `${character} moved ${move}`;
-        if (capturedCharacters) {
-            moveText += ` <span style="color: red;">(Captured ${capturedCharacters})</span>`;
+        let moveText = `${character}: ${move}`;
+        if (capturedCharacters.length > 0) {
+            moveText += ` <span style="color: red;">(Captured ${capturedCharacters.join(', ')})</span>`;
         }
         listItem.innerHTML = moveText;
         moveHistory.push(listItem.innerHTML);
@@ -357,4 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initializeGame();
+
+    // Reposition the Selected element below the grid
+    board.after(selectedElement);
 });
