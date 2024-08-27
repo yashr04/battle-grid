@@ -1,0 +1,132 @@
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #000000e5;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    grid-template-rows: repeat(5, 60px);
+    gap: 5px;
+    margin: 20px 0;
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.cell.selected {
+    border: 2px solid yellow;
+}
+
+.player-a {
+    background-color: lightblue;
+}
+
+.player-b {
+    background-color: rgb(238, 145, 22);
+}
+
+.highlight {
+    background-color: lightgreen;
+    opacity: 0.6;
+}
+
+.highlight-enemy {
+    background-color: red;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #666;
+}
+
+#move-history {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 20px;
+}
+
+#history-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    list-style-position: inside;
+    padding: 0;
+    margin-top: 10px;
+}
+
+#history-list li {
+    list-style-type: decimal;
+    text-align: left;
+    margin: 5px 0;
+}
+
+#start-game-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#start-game-button:hover {
+    background-color: #45a049;
+}
+
+#current-player, #selected {
+    text-align: center;
+    margin-bottom: 10px;
+}
