@@ -58,6 +58,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentPlayerElement.textContent = `Player A, place your P1`;
 
+        // Add character movement guide
+        const guideContainer = document.createElement('div');
+        guideContainer.id = 'movement-guide';
+        guideContainer.innerHTML = `
+            <h3>Piece Movement Guide</h3>
+            <ul>
+                <li>Pawn (P): Moves 1 step straight in any direction (⬅️ ➡️ ⬆️ ⬇️)</li>
+                <li>Hero1 (H1): Moves 2 steps straight in any direction (⬅️ ➡️ ⬆️ ⬇️)</li>
+                <li>Hero2 (H2): Moves 2 steps diagonally in any direction (↖️ ↗️ ↙️ ↘️)</li>
+            </ul>
+        `;
+        guideContainer.style.marginTop = '20px';
+        guideContainer.style.textAlign = 'left';
+        board.after(guideContainer);
+
         updateBoard();
     };
 
@@ -331,6 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedElement.style.display = 'block';
         historyContainer.style.display = 'block';
         buttons.style.display = 'block';
+        
+        // Hide the movement guide when the game starts
+        const movementGuide = document.getElementById('movement-guide');
+        if (movementGuide) {
+            movementGuide.style.display = 'none';
+        }
         
         updateBoard();
     });
